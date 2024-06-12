@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stop Watch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="watch">
+            <div class="outercircle">
+                <div class="innercircle">
+                    <span class="text minutes">0 :&nbsp;</span>
+                    <span class="text sec">0 :</span>
+                    <span class="text msec">&nbsp;0</span>
+                </div>
+            </div>
+            <div class="button-wrapper">
+                <button class="button reset display-none">Reset</button>
+                <button class="button play">Play</button>
+                <button class="button lap display-none">Lap</button>
+            </div>
+        </div>
+        <ul class="laps"></ul>
+    </div>
+
+    <script>
+        const playbutton = document.getElementsByClassName("play")[0];
+        const resetbutton = document.getElementsByClassName("reset")[0];
+        const lapbutton = document.getElementsByClassName("lap")[0];
+        const sectext = document.getElementsByClassName("sec")[0];
+        const msectext = document.getElementsByClassName("msec")[0];
+        const mintext = document.getElementsByClassName("minutes")[0];
+        let isplay = false;
+        let secInterval, msInterval, minInterval;
+        let secCounter = 0, msCounter = 0, minCounter = 0;
+
+        const togglebutton = () => {
+            lapbutton.classList.remove("display-none");
+            resetbutton.classList.remove("display-none");
+        }
+
+        const play = () => {
+            if(!isplay){
+                playbutton.innerHTML = 'Pause';
+                secInterval = setInterval(() => {
+                    if (++secCounter === 60) {
+                        secCounter = 0;
+                        minCounter++;
+                        mintext.innerHTML = `${minCounter} :&nbsp;`;
+                    }
+                    sectext.innerHTML = `${secCounter < 10 ? '0' : ''}${secCounter} :`;
+                }, 1000);
+
+                msInterval = setInterval(() => {
+                    if (++msCounter === 100) {
+                        msCounter = 0;
+                    }
+                    msectext.innerHTML = `&nbsp;${msCounter < 10 ? '0' : ''}${msCounter}`;
+                }, 10);
+
+                isplay = true;
+            } else {
+                playbutton.innerHTML = 'Play';
+                clearInterval(secInterval);
+                clearInterval(msInterval);
+                clearInterval(minInterval);
+                isplay = false;
+            }
+            togglebutton();
+        }
+
+        const reset = () => {
+            playbutton.innerHTML = 'Play';
+            lapbutton.classList.add("display-none");
+            resetbutton.classList.add("display-none");
+            sectext.innerHTML = '0 :';
+            msectext.innerHTML = '&nbsp;0';
+            mintext.innerHTML = '0 :&nbsp;';
+            secCounter = 0;
+            msCounter = 0;
+            minCounter = 0;
+            clearInterval(secInterval);
+            clearInterval(msInterval);
+            clearInterval(minInterval);
+            isplay = false;
+            document.querySelector('.laps').innerHTML = '';
+        }
+
+        const lap = () => {
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            li.setAttribute('class', 'lap-items');
+            span.setAttribute('class', 'time-stamp');
+            span.innerHTML = `${minCounter < 10 ? '0' : ''}${minCounter} : ${secCounter < 10 ? '0' : ''}${secCounter} : ${msCounter < 10 ? '0' : ''}${msCounter}`;
+            li.appendChild(span);
+            document.querySelector('.laps').appendChild(li);
+        }
+
+        playbutton.addEventListener('click', play);
+        resetbutton.addEventListener('click', reset);
+        lapbutton.addEventListener('click', lap);
+    </script>
+</body>
+</html>
